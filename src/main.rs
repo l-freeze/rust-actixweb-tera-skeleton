@@ -1,4 +1,6 @@
 use actix_web::{get, post, put, patch, delete, guard, web, App, HttpRequest, HttpResponse, HttpServer, Responder, error, Result};
+use actix_web::http::StatusCode;
+//use actix_web::middleware::errhandlers::{ErrorHandlerResponse, ErrorHandlers};
 use serde::{Serialize};
 use states::{app as app_state , example as ex_state};
 use std::sync::{Arc, Mutex};
@@ -9,6 +11,8 @@ use rand::Rng;
 mod routes;
 mod states;
 mod controllers;
+use controllers::example::{default_controller as ex_default};
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -103,8 +107,11 @@ async fn main() -> std::io::Result<()> {
         //teraを各ルートから使えるように
         //.data(templates)
         .data(tera.clone())
-
         
+        //40xなどのデフォルト※ルート毎に設定するのでweb.rsとかに書いた方がいいかも
+        //.default_service(web::route().to(ex_default::_404))
+
+  
 
         //----------------------
         //  main
@@ -117,7 +124,6 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
 //----------------------
 //State route sample
 //----------------------

@@ -1,6 +1,8 @@
 use actix_web::{get, post, put, patch, delete, guard, web, App, HttpRequest, HttpResponse, HttpServer, Responder, error, Result};
 
-use crate::controllers::example::{index_controller as ex_idx, json_controller as ex_json, html_controller as ex_html};
+use crate::controllers::example::{index_controller as ex_idx, json_controller as ex_json, html_controller as ex_html, default_controller as ex_default};
+//mod controllers::{example};
+//use example::{index_controller as ex_idx, json_controller as ex_json, html_controller as ex_html, default_controller as ex_default};
  
 //動作確認用ルーティング
 pub fn example_config(cfg: &mut web::ServiceConfig) {
@@ -43,7 +45,11 @@ pub fn example_config(cfg: &mut web::ServiceConfig) {
         //Win   -> curl.exe -X POST -H "Content-Type: application/json" -d '{\"username\":\"lfreeze\", \"freeword\":\"cant send mulitbyte\"}' localhost/example/json_post
         //         curl.exe -i -X POST -H "Content-Type: application/json" -d '{\"username\":\"hello\", \"freeword\":\"hello\"}' localhost/example/json_post
        .service(ex_html::html) // https://localhost/example/html
+       .default_service(web::route().to(ex_default::_404))
     );
+
+    //cfg.default_service(web::route().to(ex_default::_404));
+
 }
 
 //Admin

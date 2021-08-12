@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use tera::Tera;
 
 #[get("/html")]
-async fn html(tpl: web::Data<Tera>) -> Result<HttpResponse, Error>{
+pub async fn html(tpl: web::Data<Tera>) -> Result<HttpResponse, Error>{
     //let 
     let mut ctx = tera::Context::new();
     ctx.insert("name", "aaaa");
