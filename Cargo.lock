@@ -285,6 +285,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "actixweb-tera-skeleton"
+version = "0.1.0"
+dependencies = [
+ "actix-rt 2.2.0",
+ "actix-web",
+ "derive_more",
+ "diesel",
+ "r2d2",
+ "r2d2_sqlite",
+ "rand 0.8.4",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tera",
+ "thiserror",
+ "toml",
+]
+
+[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -910,25 +929,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7249a3129cbc1ffccd74857f81464a323a152173cdb134e0fd81bc803b29facf"
 dependencies = [
  "hashbrown",
-]
-
-[[package]]
-name = "headresscms"
-version = "0.1.0"
-dependencies = [
- "actix-rt 2.2.0",
- "actix-web",
- "derive_more",
- "diesel",
- "r2d2",
- "r2d2_sqlite",
- "rand 0.8.4",
- "rusqlite",
- "serde",
- "serde_json",
- "tera",
- "thiserror",
- "toml",
 ]
 
 [[package]]

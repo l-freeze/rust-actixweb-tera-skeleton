@@ -1,10 +1,20 @@
 #headresscmsのrはRustのr
 
 #cargo install cargo-watch
-#cargo watch -x "run --bin headresscms"
+#cargo watch -x "run --bin actixweb-tera-skeleton"
+
+#windows
+#$Env:MYSQLCLIENT_LIB_DIR="C:\Users\yamamoto\scoop\apps\mysql\current\lib"
+#cargo install diesel_cli --no-default-features --features mysql
+
+
+#attribute使ってるとユニットテストする為の関数の実体が分かり辛いので
+#cargo install cargo-expand
+#cargo expand
+
 
 [package]
-name = "headresscms"
+name = "actixweb-tera-skeleton"
 version = "0.1.0"
 edition = "2018"
 

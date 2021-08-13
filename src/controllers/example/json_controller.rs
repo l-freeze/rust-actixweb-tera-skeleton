@@ -1,4 +1,5 @@
 use actix_web::{get, post, put, patch, delete, guard, web, App, HttpRequest, HttpResponse, HttpServer, Responder, error, Result};
+//use actix_rt;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use derive_more::{Display, Error};
@@ -42,4 +43,27 @@ pub async fn json_post(req_json: Option<web::Json<SampleObj>>) -> HttpResponse {
         .body("No request data")        
 
     }
+}
+
+
+//TEST
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{http, test};
+    #[actix_rt::test]
+    async fn test_json_response_ok() {
+        let req = test::TestRequest::with_header("content-type", "text/plain").to_http_request();
+        let resp = json_response(req).await;
+        assert_eq!(resp.status(), http::StatusCode::OK);
+    }
+
+/*
+    #[actix_rt::test]
+    async fn test_index_not_ok() {
+        let req = test::TestRequest::default().to_http_request();
+        let resp = json_response(req).await;
+        assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
+    }
+*/
 }
