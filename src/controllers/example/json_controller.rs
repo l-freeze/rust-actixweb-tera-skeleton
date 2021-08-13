@@ -11,7 +11,6 @@ struct JsonObj{
     arr: Vec::<String>
 }
 
-#[get("/json_get")]
 pub async fn json_response() -> HttpResponse {
     HttpResponse::Ok().json(
         JsonObj{
@@ -30,7 +29,6 @@ pub struct SampleObj {
 }
 
 
-#[post("/json_post")]
 pub async fn json_post(req_json: Option<web::Json<SampleObj>>) -> HttpResponse {
     if let Some(json) = req_json {
         HttpResponse::Ok()

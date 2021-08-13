@@ -89,19 +89,12 @@ async fn main() -> std::io::Result<()> {
         //    app_name: "headresscms:ヘッドレスCMS".to_string()
         //})
         .data(ex_app.clone())
-        .service(example_app_state)
-
         //可変の共有メモリ(shared mutable state)
         .app_data(mut_shared_state.clone())
-        .service(example_mut_state)
-        .service(example_mut_state_check)
-
         //サーバー毎の共有メモリ
         .data(immutable_int_state)
         .app_data(mut_shared_servers_name.clone())
-        .service(example_mut_state_2)
-        .service(example_mut_state_servers_name)        
-        .service(example_mut_state_set_servers_name)
+        .configure(example_state::example_config)
         
 
         //teraを各ルートから使えるように
@@ -110,8 +103,7 @@ async fn main() -> std::io::Result<()> {
         
         //40xなどのデフォルト※ルート毎に設定するのでweb.rsとかに書いた方がいいかも
         //.default_service(web::route().to(ex_default::_404))
-
-  
+ 
 
         //----------------------
         //  main
@@ -124,71 +116,77 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
 //----------------------
 //State route sample
 //----------------------
-//http://localhost/_example_root/app_state
-#[get("/_example_root/app_state")]
-async fn example_app_state(data: web::Data<ex_state::AppState>) -> HttpResponse{
-    std::thread::sleep(std::time::Duration::from_secs(4));
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body( format!("app_name:{}, author:{}", data.app_name, data.author) )
-}
+mod example_state{
+    use super::*;
 
-//http://localhost/_example_root/mut_state/
-#[get("/_example_root/mut_state/")]
-async fn example_mut_state_check(state: web::Data<ex_state::MutableMessageState>) -> HttpResponse{
-    //let mut text = state.text.lock().unwrap();
-    //HttpResponse::Ok().body(format!("{}", text))
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body(format!("{}", state.text.lock().unwrap()))
-}
+    pub fn example_config(cfg: &mut web::ServiceConfig) {
+        cfg.service(
+        web::scope("/example_top")
+        .route("/app_state", web::get().to(example_app_state))
+        .route("/mut_state", web::get().to(example_mut_state_check))
+        .route("/mut_state/{setval}", web::get().to(example_mut_state))
+        .route("/mut_state_2}", web::get().to(example_mut_state_2))
+        .route("/mut_state_servers_name", web::get().to(example_mut_state_servers_name))
+        .route("/mut_state_servers_name/{newname}", web::get().to(example_mut_state_set_servers_name))
+        );
+    }
+    
+    async fn example_app_state(data: web::Data<ex_state::AppState>) -> HttpResponse{
+        std::thread::sleep(std::time::Duration::from_secs(4));
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body( format!("app_name:{}, author:{}", data.app_name, data.author) )
+    }
 
-//http://localhost/_example_root/mut_state/フリーテキスト
-#[get("/_example_root/mut_state/{setval}")]
-async fn example_mut_state(
-    web::Path(setval): web::Path<String>,
-    state: web::Data<ex_state::MutableMessageState>
-) -> HttpResponse{
-    let mut text = state.text.lock().unwrap();
-    eprint!("setval:{}", &setval);
-    *text = setval;
+    async fn example_mut_state_check(state: web::Data<ex_state::MutableMessageState>) -> HttpResponse{
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body(format!("{}", state.text.lock().unwrap()))
+    }
 
-    //std::thread::sleep(std::time::Duration::from_secs(4));
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body( format!("mut_text:{}", text) )
-}
+    async fn example_mut_state(
+        web::Path(setval): web::Path<String>,
+        state: web::Data<ex_state::MutableMessageState>
+    ) -> HttpResponse{
+        let mut text = state.text.lock().unwrap();
+        eprint!("setval:{}", &setval);
+        *text = setval;
 
-//http://localhost/_example_root/mut_state_2/
-#[get("/_example_root/mut_state_2/")]
-async fn example_mut_state_2(data: web::Data<ex_state::ImmutableIntState>) -> HttpResponse{
-    std::thread::sleep(std::time::Duration::from_secs(5));
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body(format!("{}", data.random_uint))
-}
+        //std::thread::sleep(std::time::Duration::from_secs(4));
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body( format!("mut_text:{}", text) )
+    }
 
-//http://localhost/_example_root/mut_state_servers_name/
-#[get("/_example_root/mut_state_servers_name/")]
-async fn example_mut_state_servers_name(data: web::Data<Mutex<String>>) -> HttpResponse{
-    std::thread::sleep(std::time::Duration::from_secs(3));
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body(format!("{}", data.lock().unwrap()))
-}
+    async fn example_mut_state_2(data: web::Data<ex_state::ImmutableIntState>) -> HttpResponse{
+        std::thread::sleep(std::time::Duration::from_secs(5));
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body(format!("{}", data.random_uint))
+    }
 
-//https://localhost/_example_root/mut_state_servers_name/newname
-#[get("/_example_root/mut_state_servers_name/{newname}")]
-async fn example_mut_state_set_servers_name(
-    web::Path(newname): web::Path<String>, 
-    data: web::Data<Mutex<String>>
-) -> HttpResponse{
-    let mut servername = data.lock().unwrap();
-    *servername = newname;
-    HttpResponse::Ok()
-    .content_type("text/plain; charset=UTF-8")
-    .body(format!("Set new server_name"))
+    async fn example_mut_state_servers_name(data: web::Data<Mutex<String>>) -> HttpResponse{
+        std::thread::sleep(std::time::Duration::from_secs(3));
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body(format!("{}", data.lock().unwrap()))
+    }
+
+    async fn example_mut_state_set_servers_name(
+        web::Path(newname): web::Path<String>, 
+        data: web::Data<Mutex<String>>
+    ) -> HttpResponse{
+        let mut servername = data.lock().unwrap();
+        *servername = newname;
+        HttpResponse::Ok()
+        .content_type("text/plain; charset=UTF-8")
+        .body(format!("Set new server_name"))
+    }
+
+
+
 }

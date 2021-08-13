@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'headresscms'",
+            "name": "Debug executable 'actixweb-tera-skeleton'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=headresscms",
-                    "--package=headresscms"
+                    "--bin=actixweb-tera-skeleton",
+                    "--package=actixweb-tera-skeleton"
                 ],
                 "filter": {
-                    "name": "headresscms",
+                    "name": "actixweb-tera-skeleton",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'headresscms'",
+            "name": "Debug unit tests in executable 'actixweb-tera-skeleton'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=headresscms",
-                    "--package=headresscms"
+                    "--bin=actixweb-tera-skeleton",
+                    "--package=actixweb-tera-skeleton"
                 ],
                 "filter": {
-                    "name": "headresscms",
+                    "name": "actixweb-tera-skeleton",
                     "kind": "bin"
                 }
             },

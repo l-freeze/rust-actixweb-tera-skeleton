@@ -3,7 +3,6 @@ use serde::{Serialize};
 use std::sync::Mutex;
 use tera::Tera;
 
-#[get("/html")]
 pub async fn html(tpl: web::Data<Tera>) -> Result<HttpResponse, Error>{
     //let 
     let mut ctx = tera::Context::new();

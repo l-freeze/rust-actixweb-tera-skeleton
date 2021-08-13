@@ -24,27 +24,26 @@ pub fn example_config(cfg: &mut web::ServiceConfig) {
     );
 
     cfg.service(
-      web::scope("/example") //http://localhost/example/***
-      //index_controller
-      .service(ex_idx::index)// #[get("/")]
-      .service(ex_idx::contenttype)// #[get("/contenttype")]
-      .service(ex_idx::pathparameter)// #[get("/pathparameter/{user_no}/{page}")]
-      .service(ex_idx::pathparameter)// #[get("/pathparameter/{user_no}/{page}")]
-      .service(ex_idx::_get)// #[ ***("/resource")]
-      .service(ex_idx::_post)// #[ ***("/resource")]
-      .service(ex_idx::_put)// #[ ***("/resource")]
-      .service(ex_idx::_patch)// #[ ***("/resource")]
-      .service(ex_idx::_delete)// #[ ***("/resource")]
-      .service(ex_idx::_head)// #[ ***("/resource")]
+        web::scope("/example") //http://localhost/example/***
+        //index_controller
+        .route("/", web::get().to(ex_idx::index))
+        .route("/contenttype", web::get().to(ex_idx::contenttype))
+        .route("/pathparameter/{user_no}/{page}", web::get().to(ex_idx::pathparameter))
+        .route("/resource", web::get().to(ex_idx::_get))
+        .route("/resource", web::post().to(ex_idx::_post))
+        .route("/resource", web::put().to(ex_idx::_put))
+        .route("/resource", web::patch().to(ex_idx::_patch))
+        .route("/resource", web::delete().to(ex_idx::_delete))
+        .route("/resource", web::head().to(ex_idx::_head))
 
-      //json_controller
-      .service(ex_json::json_response)// #[get("/json_get")]
-        //curl.exe -v -X POST -H 'AddHeader: addh'  -d '{"username":"lfreeze", "freeword":"日本語"}' localhost/example/json_post
-        .service(ex_json::json_post)// #[post("/json_post")]
+        //json_controller
+        .route("/json_get", web::get().to(ex_json::json_response))
+            //curl.exe -v -X POST -H 'AddHeader: addh'  -d '{"username":"lfreeze", "freeword":"日本語"}' localhost/example/json_post
+        .route("/json_post", web::post().to(ex_json::json_post))
         //Linux -> curl.exe -v -X POST -H 'application/json'  -d '{"username":"lfreeze", "freeword":"日本語"}' localhost/example/json_post
         //Win   -> curl.exe -X POST -H "Content-Type: application/json" -d '{\"username\":\"lfreeze\", \"freeword\":\"cant send mulitbyte\"}' localhost/example/json_post
         //         curl.exe -i -X POST -H "Content-Type: application/json" -d '{\"username\":\"hello\", \"freeword\":\"hello\"}' localhost/example/json_post
-       .service(ex_html::html) // https://localhost/example/html
+        .route("/html", web::get().to(ex_html::html))
        .default_service(web::route().to(ex_default::_404))
     );
 
