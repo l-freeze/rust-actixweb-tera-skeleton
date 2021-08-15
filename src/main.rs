@@ -1,6 +1,9 @@
 use actix_web::{get, post, put, patch, delete, guard, web, App, HttpRequest, HttpResponse, HttpServer, Responder, error, Result};
 use actix_web::http::StatusCode;
 //use actix_web::middleware::errhandlers::{ErrorHandlerResponse, ErrorHandlers};
+use actix_web::middleware::Logger;
+use actix_session::{CookieSession};
+use env_logger::Env;
 use serde::{Serialize};
 use states::{app as app_state , example as ex_state};
 use std::sync::{Arc, Mutex};
@@ -16,6 +19,9 @@ use controllers::example::{default_controller as ex_default};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    //ロガー
+    env_logger::from_env(Env::default().default_filter_or("info")).init();
 
     //--------------------------------
     //共有メモリ(不変): shared immutable state
@@ -55,7 +61,7 @@ async fn main() -> std::io::Result<()> {
     */
     
     HttpServer::new(move || { 
-
+        
         //--------------------------------
         //サーバー毎の共有メモリ(固定): shared immutable state
         //mutexとか何も考えなくていい
@@ -72,6 +78,11 @@ async fn main() -> std::io::Result<()> {
     
         //********START APP********//
         App::new()
+
+        //ロギング
+        .wrap(Logger::default())
+        .wrap(Logger::new("%a %{User-Agent}i"))
+        
         //----------------------
         //  test
         //----------------------
@@ -96,6 +107,12 @@ async fn main() -> std::io::Result<()> {
         .app_data(mut_shared_servers_name.clone())
         .configure(example_state::example_config)
         
+        //セッション使えるように、しかもクッキーセッションという謎技術
+        //(web.rsとかのconfigu配下だとrouteを指定しないといけない（？）から不便)//どうせ共通だからここに書けばいい
+        .wrap(
+            CookieSession::signed(&[0; 32]) // <- create cookie based session middleware
+                .secure(false),
+        )    
 
         //teraを各ルートから使えるように
         //.data(templates)

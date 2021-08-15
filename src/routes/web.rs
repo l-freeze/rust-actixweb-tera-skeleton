@@ -1,11 +1,20 @@
 use actix_web::{get, post, put, patch, delete, guard, web, App, HttpRequest, HttpResponse, HttpServer, Responder, error, Result};
+//use actix_session::{CookieSession, Session};
+use crate::controllers::example::{
+    index_controller as ex_idx, 
+    json_controller as ex_json, 
+    html_controller as ex_html, 
+    default_controller as ex_default,
+    session_controller as ex_session,
+    static_controller as ex_static
 
-use crate::controllers::example::{index_controller as ex_idx, json_controller as ex_json, html_controller as ex_html, default_controller as ex_default};
+};
 //mod controllers::{example};
 //use example::{index_controller as ex_idx, json_controller as ex_json, html_controller as ex_html, default_controller as ex_default};
  
 //動作確認用ルーティング
 pub fn example_config(cfg: &mut web::ServiceConfig) {
+    
     //Example
     //Test routing1
     //curl.exe -X [GET|POST] -H 'OriginalHead: org' localhost/testroute1
@@ -22,6 +31,7 @@ pub fn example_config(cfg: &mut web::ServiceConfig) {
         .route("", web::head().to(||HttpResponse::Ok().body("testroute2:head")))
         //curl.exe -X [GET|POST] -H 'OriginalHead: org' localhost/testroute1
     );
+
 
     cfg.service(
         web::scope("/example") //http://localhost/example/***
@@ -44,7 +54,17 @@ pub fn example_config(cfg: &mut web::ServiceConfig) {
         //Win   -> curl.exe -X POST -H "Content-Type: application/json" -d '{\"username\":\"lfreeze\", \"freeword\":\"cant send mulitbyte\"}' localhost/example/json_post
         //         curl.exe -i -X POST -H "Content-Type: application/json" -d '{\"username\":\"hello\", \"freeword\":\"hello\"}' localhost/example/json_post
         .route("/html", web::get().to(ex_html::html))
-       .default_service(web::route().to(ex_default::_404))
+        
+        //セッション管理
+        .route("/session", web::get().to(ex_session::index))
+
+        //デフォルトページ
+        .default_service(web::route().to(ex_default::_404))
+
+        //static file route
+        .route("/js/{filepath}", web::get().to(ex_static::static_file))
+        .route("/css/{filepath}", web::get().to(ex_static::static_file))
+        .route("/img/{filepath}", web::get().to(ex_static::static_file))
     );
 
     //cfg.default_service(web::route().to(ex_default::_404));

@@ -23,8 +23,14 @@ edition = "2018"
 [dependencies]
 rand = "0.8.4"
 actix-web = "3.3.2"
-#actix-webのテストに必要っぽい
+#actix-rtはactix-webのテストに必要っぽい
 actix-rt = "2.2.0"
+#静的ファイルの為
+actix-files = "0.5.0"
+#ロガー
+env_logger = "0.9.0"
+#セッション管理用
+actix-session = "0.4.1"
 derive_more = "0.99.16"
 thiserror = "1.0.25"
 #askama = "0.10.5"

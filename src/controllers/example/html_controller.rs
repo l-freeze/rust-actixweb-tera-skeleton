@@ -9,7 +9,7 @@ pub async fn html(tpl: web::Data<Tera>) -> Result<HttpResponse, Error>{
     ctx.insert("name", "aaaa");
     ctx.insert("assign", "アサイン");
     let view = tpl.render("example/index.html.tera", &ctx).map_err(|e| error::ErrorInternalServerError(e))?;
-
+    
     Ok(HttpResponse::Ok().content_type("text/html").body(view))
 }
 

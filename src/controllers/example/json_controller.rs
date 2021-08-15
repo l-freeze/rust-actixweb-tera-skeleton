@@ -48,20 +48,22 @@ pub async fn json_post(req_json: Option<web::Json<SampleObj>>) -> HttpResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use actix_web::{http, test};
+    use actix_web::{test, web, App};
+
     #[actix_rt::test]
-    async fn test_json_response_ok() {
-        let req = test::TestRequest::with_header("content-type", "text/plain").to_http_request();
-        let resp = json_response(req).await;
-        assert_eq!(resp.status(), http::StatusCode::OK);
+    async fn test_json_response() {
+        let mut app = test::init_service(App::new().route("/", web::get().to(json_response))).await;
+        let req = test::TestRequest::with_header("content-type", "text/plain").to_request();
+        let resp = test::call_service(&mut app, req).await;
+        assert!(resp.status().is_success());
     }
 
-/*
     #[actix_rt::test]
-    async fn test_index_not_ok() {
-        let req = test::TestRequest::default().to_http_request();
-        let resp = json_response(req).await;
-        assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
+    async fn test_index_post() {
+        let mut app = test::init_service(App::new().route("/", web::post().to(json_post))).await;
+        let req = test::TestRequest::post().uri("/").to_request();
+        let resp = test::call_service(&mut app, req).await;
+        //assert!(resp.status().is_client_error());
+        assert!(resp.status().is_success());
     }
-*/
 }
